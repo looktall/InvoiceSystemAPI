@@ -10,7 +10,7 @@ require('dotenv').config();
 
 const config = {
   connectionString:
-    "postgres://gameportal_db_user:TnJdfCS9gNV1j1P19fsGp2H14t6qkf1N@dpg-cjrcte61208c73bkhro0-a.singapore-postgres.render.com/gameportal_db?ssl=true",
+    "postgres://invoice_system_db_user:6vTelxmjfHXlSsngFMMv1jgriP3QRas3@dpg-cle2018lccns73ade9og-a.singapore-postgres.render.com/invoice_system_db?ssl=true",
 };
 
 const { Client } = require('pg');
@@ -27,11 +27,17 @@ app.listen(PORT, () => {
 });
 
 var transporter = nodemailer.createTransport({
-    service: 'outlook',
-    auth: {
-      user: 'accounts@looktall.xyz',
-      pass: 'Xok88060abc'
-    }
+  service: "Outlook365",
+  host: "smtp.office365.com",
+  port: "587",
+  tls: {
+    ciphers: "SSLv3",
+    rejectUnauthorized: false,
+  },
+  auth: {
+    user: 'accounts@looktall.xyz',
+    pass: 'Xok88060abc'
+  },
 });
   
 function SendInvoice()
@@ -198,7 +204,7 @@ app.get('/vendor/get/:id', verifyToken, async (req, res) => {
 })
 
 app.post('/vendor/create', async (req, res) => {
-    client.query("INSERT INTO vendors (name, email) VALUES ($1, $2)", [req.body.name, req.body.email])
+    client.query("INSERT INTO vendors (name, company_name, address, email, contact_no, created_by) VALUES ($1, $2, $3, $4, $5, $6)", [req.body.name, req.body.companyName, req.body.address, req.body.email, req.body.contactNo, req.user.userId])
           .then((result) => {
               res.status(201).send("Register Success");
           })
@@ -209,7 +215,7 @@ app.post('/vendor/create', async (req, res) => {
 });
 
 app.post('/vendor/edit/:id', async (req, res) => {
-  client.query("UPDATE vendors SET name = $1, email = $2 WHERE id = $3", [req.body.name, req.body.email, result.params.id])
+  client.query("UPDATE vendors SET name = $1, company_name = $2, address = $3, email = $4, contact_no = $5 WHERE id = $6", [req.body.name, req.body.companyName, req.body.address, req.body.email, req.body.contactNo, result.params.id])
         .then((result) => {
             res.status(201).send("Vendor Update Success");
         })
@@ -237,10 +243,15 @@ app.get('/invoice/get/', verifyToken, async (req, res) => {
 
   const page = parseInt(req.query.page) || 1;
   const pageSize = parseInt(req.query.pageSize) || 15;
-  const vendorName = req.query.vendorName || "*";
+  const vendorName = req.query.vendorName || null;
 
-  client.query("SELECT * FROM invoices WHERE vendorName = $1", [vendorName])
+  client.query("SELECT * FROM invoices")
         .then((result) => {
+
+          if(vendorName != null)
+          {
+            result.rows = result.rows.filter(item => item.name === vendorName);
+          }
 
           const startIndex = (page - 1) * pageSize;
           const endIndex = page * pageSize;
@@ -276,7 +287,7 @@ app.get('/invoice/get/:id', verifyToken, async (req, res) => {
 })
 
 app.post('/invoice/create', async (req, res) => {
-  client.query("INSERT INTO invoices (name, email) VALUES ($1, $2)", [req.body.name, req.body.email])
+  client.query("INSERT INTO invoices (recipient, item_list, total) VALUES ($1, $2, $3)", [req.body.recipient, req.body.item_list, req.body.total])
         .then((result) => {
             res.status(201).send("Invoice Created");
         })
@@ -287,9 +298,9 @@ app.post('/invoice/create', async (req, res) => {
 });
 
 app.post('/invoice/edit/:id', async (req, res) => {
-  client.query("UPDATE invoices SET name = $1, email = $2 WHERE id = $3", [req.body.name, req.body.email, result.params.id])
+  client.query("UPDATE invoices SET recipient = $1, item_list = $2,  total = $3 WHERE id = $4", [req.body.recipient, req.body.item_list, req.body.total, result.params.id])
         .then((result) => {
-            res.status(201).send("Vendor Update Success");
+            res.status(201).send("Invoice Update Success");
         })
         .catch((e) => {
             console.error(e.stack);
