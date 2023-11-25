@@ -319,5 +319,3 @@ app.post('/invoice/delete/:id', async (req, res) => {
         })
 });
 //#endregion
-
-SendInvoice();
