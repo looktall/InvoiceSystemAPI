@@ -204,7 +204,7 @@ app.get('/vendor/get/:id', verifyToken, async (req, res) => {
 })
 
 app.post('/vendor/create', async (req, res) => {
-    client.query("INSERT INTO vendors (name, company_name, address, email, contact_no, created_by) VALUES ($1, $2, $3, $4, $5, $6)", [req.body.name, req.body.companyName, req.body.address, req.body.email, req.body.contactNo, req.user.userId])
+    client.query("INSERT INTO vendors (vendor_name, company_name, address, email, contact_no, created_by) VALUES ($1, $2, $3, $4, $5, $6)", [req.body.vendorName, req.body.companyName, req.body.address, req.body.email, req.body.contactNo, req.user.userId])
           .then((result) => {
               res.status(201).send("Register Success");
           })
@@ -215,7 +215,7 @@ app.post('/vendor/create', async (req, res) => {
 });
 
 app.post('/vendor/edit/:id', async (req, res) => {
-  client.query("UPDATE vendors SET name = $1, company_name = $2, address = $3, email = $4, contact_no = $5 WHERE id = $6", [req.body.name, req.body.companyName, req.body.address, req.body.email, req.body.contactNo, result.params.id])
+  client.query("UPDATE vendors SET vendor_name = $1, company_name = $2, address = $3, email = $4, contact_no = $5 WHERE id = $6", [req.body.vendorName, req.body.companyName, req.body.address, req.body.email, req.body.contactNo, result.params.id])
         .then((result) => {
             res.status(201).send("Vendor Update Success");
         })
