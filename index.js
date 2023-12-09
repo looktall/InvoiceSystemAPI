@@ -161,6 +161,27 @@ app.post('/user/create', async (req, res) => {
         })
 })
 
+app.get('/user/get/', verifyToken, async (req, res) => {
+
+  client.query("SELECT * FROM users")
+        .then((result) => {
+          const startIndex = (page - 1) * pageSize;
+          const endIndex = page * pageSize;
+          const paginatedItems = result.rows.slice(startIndex, endIndex);
+
+          res.json({
+            page,
+            pageSize,
+            totalItems: result.rows.length,
+            totalPages: Math.ceil(result.rows.length / pageSize),
+            items: paginatedItems,
+          });
+        })
+        .catch((e) => {
+          console.error(e.stack);
+          res.status(500).send(e.stack);
+        })
+})
 
 //#region Vendor
 app.get('/vendor/get/', verifyToken, async (req, res) => {
