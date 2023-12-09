@@ -163,6 +163,9 @@ app.post('/user/create', async (req, res) => {
 
 app.get('/user/get/', verifyToken, async (req, res) => {
 
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 15;
+
   client.query("SELECT * FROM users")
         .then((result) => {
           const startIndex = (page - 1) * pageSize;
