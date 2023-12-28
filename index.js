@@ -228,9 +228,29 @@ app.get('/vendor/get/:id', verifyToken, async (req, res) => {
 })
 
 app.post('/vendor/create', async (req, res) => {
-    client.query("INSERT INTO vendors (vendor_name, company_name, address, email, contact_no, created_by) VALUES ($1, $2, $3, $4, $5, $6)", [req.body.vendorName, req.body.companyName, req.body.address, req.body.email, req.body.contactNo, req.user.userId])
+
+    let query = `INSERT INTO vendors
+      (vendor_name, vendor_type, NRIC, company_name, address, email, contact_no, payment_term, bank_name, beneficiary_name, account_no, created_by)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`;
+
+    let params = [
+      req.body.vendorName,
+      req.body.vendorType,
+      req.body.NRIC,
+      req.body.companyName,
+      req.body.address,
+      req.body.email,
+      req.body.contactNo,
+      req.body.paymentTerm,
+      req.body.bankName,
+      req.body.beneficiaryName,
+      req.body.accountNo,
+      req.user.userId
+    ];
+
+    client.query(query, params)
           .then((result) => {
-              res.status(201).send("Register Success");
+              res.status(201).send("Vendor Create Success");
           })
           .catch((e) => {
               console.error(e.stack);
@@ -238,8 +258,39 @@ app.post('/vendor/create', async (req, res) => {
           })
 });
 
-app.post('/vendor/edit/:id', async (req, res) => {
-  client.query("UPDATE vendors SET vendor_name = $1, company_name = $2, address = $3, email = $4, contact_no = $5 WHERE id = $6", [req.body.vendorName, req.body.companyName, req.body.address, req.body.email, req.body.contactNo, result.params.id])
+app.post('/vendor/edit/', async (req, res) => {
+
+  let query = `UPDATE vendors SET
+        vendor_name = $1,
+        vendor_type = $2,
+        NRIC = $3,
+        company_name = $4,
+        address = $5,
+        email = $6,
+        contact_no = $7,
+        payment_term = $8,
+        bank_name = $9,
+        beneficiary_name = $10,
+        account_no = $11
+        WHERE id = $12
+      )`;
+
+    let params = [
+      req.body.vendorName,
+      req.body.vendorType,
+      req.body.NRIC,
+      req.body.companyName,
+      req.body.address,
+      req.body.email,
+      req.body.contactNo,
+      req.body.paymentTerm,
+      req.body.bankName,
+      req.body.beneficiaryName,
+      req.body.accountNo,
+      req.body.vendorId
+    ];
+
+  client.query(query, params)
         .then((result) => {
             res.status(201).send("Vendor Update Success");
         })
@@ -249,8 +300,8 @@ app.post('/vendor/edit/:id', async (req, res) => {
         })
 });
 
-app.post('/vendor/delete/:id', async (req, res) => {
-  client.query("UPDATE vendors SET deleted_at = NOW() WHERE id = $1", [req.params.id])
+app.post('/vendor/delete/', async (req, res) => {
+  client.query("UPDATE vendors SET deleted_at = NOW() WHERE id = $1", [req.body.vendorId])
         .then((result) => {
             res.status(201).send("Vendor Deleted");
         })
@@ -259,7 +310,6 @@ app.post('/vendor/delete/:id', async (req, res) => {
             res.status(500).send(e.stack);
         })
 });
-
 //#endregion
 
 //#region Invoice
