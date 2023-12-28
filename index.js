@@ -230,13 +230,13 @@ app.get('/vendor/get/:id', verifyToken, async (req, res) => {
 app.post('/vendor/create', verifyToken, async (req, res) => {
 
     let query = `INSERT INTO vendors
-      (vendor_name, vendor_type, NRIC, company_name, address, email, contact_no, payment_term, bank_name, beneficiary_name, account_no, created_by)
+      (vendor_name, vendor_type, icNumber, company_name, address, email, contact_no, payment_term, bank_name, beneficiary_name, account_no, created_by)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`;
 
     let params = [
       req.body.vendorName,
       req.body.vendorType,
-      req.body.NRIC,
+      req.body.ic_number,
       req.body.companyName,
       req.body.address,
       req.body.email,
@@ -263,7 +263,7 @@ app.post('/vendor/edit/', async (req, res) => {
   let query = `UPDATE vendors SET
         vendor_name = $1,
         vendor_type = $2,
-        NRIC = $3,
+        ic_number = $3,
         company_name = $4,
         address = $5,
         email = $6,
@@ -278,7 +278,7 @@ app.post('/vendor/edit/', async (req, res) => {
     let params = [
       req.body.vendorName,
       req.body.vendorType,
-      req.body.NRIC,
+      req.body.icNumber,
       req.body.companyName,
       req.body.address,
       req.body.email,
