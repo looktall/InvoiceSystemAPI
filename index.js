@@ -227,7 +227,7 @@ app.get('/vendor/get/:id', verifyToken, async (req, res) => {
           })
 })
 
-app.post('/vendor/create', async (req, res) => {
+app.post('/vendor/create', verifyToken, async (req, res) => {
 
     let query = `INSERT INTO vendors
       (vendor_name, vendor_type, NRIC, company_name, address, email, contact_no, payment_term, bank_name, beneficiary_name, account_no, created_by)
@@ -300,7 +300,7 @@ app.post('/vendor/edit/', async (req, res) => {
         })
 });
 
-app.post('/vendor/delete/', async (req, res) => {
+app.post('/vendor/delete/', verifyToken, async (req, res) => {
   client.query("UPDATE vendors SET deleted_at = NOW() WHERE id = $1", [req.body.vendorId])
         .then((result) => {
             res.status(201).send("Vendor Deleted");
@@ -360,7 +360,7 @@ app.get('/invoice/get/:id', verifyToken, async (req, res) => {
         })
 })
 
-app.post('/invoice/create', async (req, res) => {
+app.post('/invoice/create', verifyToken, async (req, res) => {
   client.query("INSERT INTO invoices (recipient, item_list, total) VALUES ($1, $2, $3)", [req.body.recipient, req.body.item_list, req.body.total])
         .then((result) => {
             res.status(201).send("Invoice Created");
@@ -371,7 +371,7 @@ app.post('/invoice/create', async (req, res) => {
         })
 });
 
-app.post('/invoice/edit/:id', async (req, res) => {
+app.post('/invoice/edit/:id', verifyToken, async (req, res) => {
   client.query("UPDATE invoices SET recipient = $1, item_list = $2,  total = $3 WHERE id = $4", [req.body.recipient, req.body.item_list, req.body.total, result.params.id])
         .then((result) => {
             res.status(201).send("Invoice Update Success");
@@ -382,7 +382,7 @@ app.post('/invoice/edit/:id', async (req, res) => {
         })
 });
 
-app.post('/invoice/delete/:id', async (req, res) => {
+app.post('/invoice/delete/:id', verifyToken, async (req, res) => {
   client.query("UPDATE invoice SET deleted_at = NOW() WHERE id = $1", [req.params.id])
         .then((result) => {
             res.status(201).send("Invoice Deleted");
